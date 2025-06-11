@@ -1,0 +1,325 @@
+/* Button style for details button in product card */
+.product-card button.details-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #e65100;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.product-card button.details-button:hover {
+  background-color: #bf360c;
+}
+
+/* Base body styling */
+body {
+  background-color: #1a1a1a; /* Dark background */
+  color: white;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+/* Container for main content */
+.container {
+  position: relative;
+  z-index: 2; /* Above background images */
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Background logos (images) */
+.bg-logo {
+  position: fixed;
+  pointer-events: none; /* Allow clicks through images */
+  user-select: none;
+  z-index: 0;
+  opacity: 0.1; /* Subtle transparency */
+  transition: opacity 0.3s ease;
+}
+
+/* Position each background image */
+#bjersey {
+  top: 10%;
+  left: 5%;
+  width: 120px;
+}
+
+#ball {
+  top: 50%;
+  right: 10%;
+  width: 80px;
+}
+
+#hat {
+  bottom: 15%;
+  left: 15%;
+  width: 100px;
+}
+
+#ljersey {
+  bottom: 10%;
+  right: 20%;
+  width: 130px;
+}
+
+/* Create Profile button styling */
+#create-profile-btn {
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #e65100; /* Orange */
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  display: block;
+  width: 150px;
+  text-align: center;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+#create-profile-btn:hover {
+  background-color: #bf360c;
+}
+
+/* Header styles */
+header {
+  background-color: #f5f5f5;
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;   /* prevent wrapping */
+  overflow: visible;
+}
+
+header h1 {
+  font-size: 32px;      /* balanced title size */
+  margin: 0;
+  font-weight: 900;
+  color: #1a1a1a;
+  flex-shrink: 0;       /* prevent shrinking */
+}
+
+header nav {
+  display: flex;
+  gap: 20px;
+  white-space: nowrap;  /* keep nav items in one line */
+  overflow-x: auto;     /* allow horizontal scroll if needed */
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile */
+  flex-grow: 1;         /* nav takes remaining space */
+  min-width: 0;         /* allow flex shrink */
+}
+
+header nav a {
+  padding: 5px 10px;
+  min-width: 60px;
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Hero Banner and Details */
+.hero-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 30px;
+  gap: 30px;
+  overflow: visible;
+  min-height: 400px;
+  position: relative;
+}
+
+.image-container {
+  flex: 1 1 50%;
+  max-width: 600px;
+  transition: all 0.7s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+}
+
+.image-container.shrunk {
+  flex: 0 0 40%;
+  max-width: 300px;
+  filter: brightness(0.7);
+  transform: scale(0.9);
+  transition: all 0.7s ease;
+}
+
+.image-container img {
+  position: relative;
+  top: 20px; /* lowers image position */
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: all 0.7s ease;
+}
+
+.banner-text {
+  flex: 1 1 40%;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 30px 40px;
+  border-radius: 10px;
+  max-width: 350px;
+  text-align: left;
+  transition: all 0.7s ease;
+}
+
+.banner-text h2 {
+  margin: 0 0 20px;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.banner-text p {
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.banner-text .price {
+  font-size: 28px;
+  font-weight: 900;
+  color: #e65100; /* Orange accent */
+  margin: 15px 0 0 0;
+}
+
+.banner-text.shrunk {
+  max-width: 500px;
+  font-size: 22px;
+}
+
+.hero {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.hero button {
+  background-color: black;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.form-section {
+  display: none;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.form-section form {
+  display: inline-block;
+  text-align: left;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.form-section input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.form-section button {
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* -------------------- */
+/* RESPONSIVE STYLES    */
+/* -------------------- */
+
+@media (max-width: 768px) {
+  .hero-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .image-container,
+  .image-container.shrunk {
+    max-width: 100%;
+    flex: 0 0 auto;
+    transform: scale(1);
+    filter: none;
+  }
+
+  .banner-text,
+  .banner-text.shrunk {
+    max-width: 100%;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  header h1 {
+    font-size: 24px;
+  }
+
+  header nav {
+    flex-wrap: wrap;
+    gap: 10px;
+    overflow-x: auto;
+  }
+
+  .form-section form {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-text h2 {
+    font-size: 24px;
+  }
+
+  .banner-text p {
+    font-size: 16px;
+  }
+
+  .banner-text .price {
+    font-size: 22px;
+  }
+
+  #create-profile-btn {
+    width: 100%;
+  }
+}

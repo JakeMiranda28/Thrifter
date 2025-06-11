@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thrift Store</title>
+  <style>
+    body {
+      background: #fff;
+      color: #1a1a1a;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    header {
+      background: #fff;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #eee;
+    }
+    header h1 {
+      font-size: 32px;
+      margin: 0;
+      font-weight: 900;
+      color: #1a1a1a;
+    }
+    .nav-wrapper {
+      flex-grow: 1;
+      overflow-x: auto;
+      margin-left: 20px;
+    }
+    header nav {
+      display: flex;
+      gap: 20px;
+      white-space: nowrap;
+    }
+    header nav a {
+      padding: 5px 10px;
+      text-decoration: none;
+      color: black;
+      font-weight: bold;
+      outline: none;
+      user-select: none;
+    }
+    header nav a.active {
+      color: #e65100;
+      border-bottom: 2px solid #e65100;
+    }
+
+    .product-listing {
+      padding: 40px 20px;
+      background: #f5f5f5;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .product-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 330px;
+    }
+    .product-card:hover {
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    .product-card img {
+      width: 100%;
+      max-width: 180px;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .product-card h4 {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 0 5px;
+      color: #333;
+    }
+    .product-card .price {
+      color: #e65100;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .shop-now-btn {
+      margin-top: auto;
+      padding: 8px 18px;
+      background: #e65100;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+      outline: none;
+    }
+    .shop-now-btn:hover, .shop-now-btn:focus {
+      background: #bf360c;
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px 24px;
+      max-width: 1000px;
+      width: 95%;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      outline: none;
+    }
+    .close-modal {
+      position: absolute;
+      right: 18px;
+      top: 8px;
+      font-size: 32px;
+      color: #888;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 2;
+      background: none;
+      border: none;
+    }
+    .modal-body {
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .modal-left {
+      min-width: 320px;
+      max-width: 380px;
+      flex: 1 1 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .modal-left img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      object-fit: cover;
+      max-height: 330px;
+      background: #fafafa;
+    }
+    .modal-thumbs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .modal-thumbs img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 7px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      background: #f4f4f4;
+    }
+    .modal-thumbs img.active, .modal-thumbs img:focus, .modal-thumbs img:hover {
+      border-color: #e65100;
+      outline: none;
+    }
+    .modal-right {
+      flex: 1 1 330px;
+      min-width: 270px;
+      max-width: 400px;
+    }
+    #modal-title {
+      font-size: 28px;
+      margin: 0 0 12px;
+    }
+    .modal-price {
+      color: #e65100;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .label {
+      font-weight: bold;
+      margin: 18px 0 7px 0;
+      display: block;
+    }
+    .size-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .size-buttons button {
+      background: #fff;
+      border: 1.5px solid #ddd;
+      border-radius: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 15px;
+      margin: 4px 0;
+      transition: border 0.2s, background 0.2s;
+      outline: none;
+    }
+    .size-buttons button.selected, .size-buttons button:focus {
+      border-color: #e65100;
+      background: #ffe2c7;
+      outline: none;
+    }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 0 16px;
+    }
+    .quantity-controls button {
+      width: 32px;
+      height: 32px;
+      font-size: 20px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      border-radius: 6px;
+      outline: none;
+    }
+    .quantity-controls input {
+      width: 40px;
+      text-align: center;
+      font-size: 17px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #f9f9f9;
+    }
+    .modal-actions {
+      display: flex;nba
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .add-to-cart-btn, .buy-now-btn {
+      padding: 12px 28px;
+      font-size: 17px;
+      border: none;
+      border-radius: 7px;
+      background: #e65100;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+      outline: none;
+    }
+    .add-to-cart-btn {
+      background: #fff;
+      color: #e65100;
+      border: 2px solid #e65100;
+    }
+    .add-to-cart-btn:hover, .add-to-cart-btn:focus {
+      background: #ffe2c7;
+      color: #e65100;
+      outline: none;
+    }
+    .buy-now-btn:hover, .buy-now-btn:focus {
+      background: #bf360c;
+      outline: none;
+    }
+    @media (max-width: 900px) {
+      .modal-body { flex-direction: column; align-items: center; }
+      .modal-left, .modal-right { max-width: 100%; min-width: 0; }
+    }
+    @media (max-width: 700px) {
+      .product-grid { grid-template-columns: 1fr 1fr; }
+      .modal-content { padding: 8px 2vw; }
+    }
+    @media (max-width: 500px) {
+      .product-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Thrift Store</h1>
+    <div class="nav-wrapper">
+      <nav>
+        <a href="#" id="nav-men">Men</a>
+        <a href="#">Women</a>
+        <a href="#">Luxury</a>
+        <a href="#">Beauty</a>
+        <a href="#">Kids</a>
+        <a href="#">Sneakers</a>
+        <a href="#">Accessories</a>
+        <a href="#">Sale</a>
+      </nav>
+    </div>
+  </header>
+  <!-- Product Listing -->
+  <section class="product-listing">
+    <div class="product-grid" id="productGrid" role="list">
+      <!-- Cards populated by JS -->
+    </div>
+  </section>
+  <!-- Product Details Modal -->
+  <div class="modal" id="product-modal" tabindex="-1" aria-modal="true" role="dialog">
+    <div class="modal-content" id="modal-content" tabindex="0">
+      <button class="close-modal" id="close-modal" aria-label="Close">&times;</button>
+      <div class="modal-body">
+        <div class="modal-left">
+          <img id="modal-main-img" src="" alt="Product Image" />
+          <div class="modal-thumbs" id="modal-thumbs"></div>
+        </div>
+        <div class="modal-right">
+          <h2 id="modal-title"></h2>
+          <div class="modal-price" id="modal-price"></div>
+          <div class="label">Color</div>
+          <div id="modal-color"></div>
+          <div class="label">Size</div>
+          <div class="size-buttons" id="modal-sizes"></div>
+          <div class="label">Quantity</div>
+          <div class="quantity-controls">
+            <button id="modal-qty-minus" aria-label="Decrease quantity">-</button>
+            <input type="text" id="modal-qty" value="1" readonly aria-label="Product quantity">
+            <button id="modal-qty-plus" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="modal-actions">
+            <button class="add-to-cart-btn">Add to Cart</button>
+            <button class="buy-now-btn">Buy Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Demo: Add your products here
+    const products = [
+      {
+        name: "NBA Vintage Leather Jacket",
+        price: 10000,
+        color: "White",
+        images: [
+          "Vintage Jacket.webp",
+          "Vintage Jacket -1.webp",
+          "Vintage Jacket - 2.webp"
+        ],
+        sizes: [36,37,38,39,40,41,42,43,44,45,46]
+      },
+      {
+        name: "Chicago Bulls Vintage Snapback",
+        price: 3000,
+        color: "Red",
+        images: ["VCAP.webp",
+          "VCAP-back.webp",
+          "VCAP-BRIM.webp",
+          "VCAP-STITCH.webp",
+          "VCAP-TAG.webp",
+
+        ],
+        sizes: ["S","M","L"]
+      }
+      // Add more products as needed
+    ];
+
+    // Render product cards
+    const grid = document.getElementById('productGrid');
+    products.forEach((p,i) => {
+      const card = document.createElement('div');
+      card.className = "product-card";
+      card.setAttribute("role", "listitem");
+      card.innerHTML = `
+        <img src="${p.images[0]}" alt="${p.name}" />
+        <h4>${p.name}</h4>
+        <p class="price">₱${Number(p.price).toLocaleString()}</p>
+        <button class="shop-now-btn" data-idx="${i}">SHOP NOW</button>
+      `;
+      grid.appendChild(card);
+    });
+
+    // Modal logic
+    let selectedIdx = 0, selectedSize = null, qty = 1, selectedImg = 0;
+
+    function openModal(idx){
+      selectedIdx = idx; qty = 1; selectedImg = 0;
+      const p = products[idx];
+      document.getElementById('modal-title').innerText = p.name;
+      document.getElementById('modal-price').innerText = "₱" + Number(p.price).toLocaleString();
+      document.getElementById('modal-color').innerText = p.color;
+      document.getElementById('modal-qty').value = qty;
+      // Images
+      document.getElementById('modal-main-img').src = p.images[0];
+      document.getElementById('modal-main-img').alt = p.name;
+      // Thumbs
+      let thumbs = "";
+      p.images.forEach((img, i) => {
+        thumbs += `<img src="${img}" alt="${p.name} thumbnail ${i+1}" tabindex="0" class="${i===0?'active':''}" data-i="${i}">`;
+      });
+      document.getElementById('modal-thumbs').innerHTML = thumbs;
+      // Sizes
+      let sizes = "";
+      p.sizes.forEach((sz,i) => {
+        sizes += `<button type="button" class="size-btn${i===0?' selected':''}" aria-label="Select size ${sz}">${sz}</button>`;
+      });
+      document.getElementById('modal-sizes').innerHTML = sizes;
+      selectedSize = p.sizes[0];
+      document.getElementById('product-modal').classList.add('show');
+      document.getElementById('modal-content').focus();
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Delegate Shop Now button clicks (dynamic)
+    grid.onclick = function(e){
+      if(e.target.classList.contains('shop-now-btn')){
+        openModal(Number(e.target.dataset.idx));
+      }
+    };
+
+    // Modal close events
+    document.getElementById('close-modal').onclick = closeModal;
+    document.getElementById('product-modal').onclick = function(e){
+      if(e.target === this) closeModal();
+    };
+    function closeModal() {
+      document.getElementById('product-modal').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Size selection
+    document.getElementById('modal-sizes').onclick = function(e){
+      if(e.target.classList.contains('size-btn')){
+        document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('selected'));
+        e.target.classList.add('selected');
+        selectedSize = e.target.innerText;
+      }
+    };
+
+    // Thumbnails
+    document.getElementById('modal-thumbs').onclick = function(e){
+      if(e.target.tagName==="IMG"){
+        selectedImg = Number(e.target.dataset.i);
+        document.getElementById('modal-main-img').src = products[selectedIdx].images[selectedImg];
+        document.querySelectorAll('#modal-thumbs img').forEach((img,i)=>img.classList.toggle('active',i===selectedImg));
+      }
+    }
+
+    // Keyboard thumbnail navigation
+    document.getElementById('modal-thumbs').addEventListener('keydown', function(e){
+      if (!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+      let imgs = Array.from(document.querySelectorAll('#modal-thumbs img'));
+      let current = imgs.findIndex(img => img.classList.contains('active'));
+      if(e.key === "ArrowLeft") current = (current - 1 + imgs.length) % imgs.length;
+      else current = (current + 1) % imgs.length;
+      imgs[current].focus();
+      imgs.forEach((img,i)=>img.classList.toggle('active',i===current));
+      document.getElementById('modal-main-img').src = products[selectedIdx].images[current];
+    });
+
+    // Qty handlers
+    document.getElementById('modal-qty-minus').onclick = function(){
+      qty = Math.max(1, qty-1);
+      document.getElementById('modal-qty').value = qty;
+    }
+    document.getElementById('modal-qty-plus').onclick = function(){
+      qty = Math.min(99, qty+1);
+      document.getElementById('modal-qty').value = qty;
+    }
+
+    // Keyboard close (esc), tab trap
+    document.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('product-modal');
+      if(modal.classList.contains('show')) {
+        if(e.key==="Escape") closeModal();
+        // Simple tab trap
+        if(e.key==="Tab") {
+          const focusable = modal.querySelectorAll('button, [tabindex="0"], input');
+          const first = focusable[0], last = focusable[focusable.length-1];
+          if(e.shiftKey && document.activeElement === first) {
+            e.preventDefault(); last.focus();
+          } else if(!e.shiftKey && document.activeElement === last) {
+            e.preventDefault(); first.focus();
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
